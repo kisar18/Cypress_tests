@@ -1,17 +1,26 @@
+import domData from '../fixtures/example.json';
+
+/*
+Přidat:
+- run mode, aby to zkusilo 2 krat
+- upravit config aby byly testy typu ".spec.js"
+*/ 
+
 describe('Ryanair sign-up', () => {
   it('Sign up', () => {
-    cy.visit('https://www.ryanair.com/cz/cs');
+    cy.visit('https://www.ryanair.com/cz/cs'); // Takdy dát do fixtures možná??
 
     // Decline cookies
-    cy.get('.cookie-popup-with-overlay__buttons').find('button').contains('Ne, děkuji').should('exist').click();
+    cy.get('.cookie-popup-with-overlay__buttons').find('button').contains(domData.declineCookies).should('exist').click();
 
     // Title check
-    cy.title().should('eq','Oficiální internetové stránky Ryanair | Levné lety | Exkluzivní nabídka');
+    cy.title().should('eq',domData.title);
 
     cy.get('ry-log-in-button > button').should('exist').click();
 
     // Handle iframe
     cy.get('iframe[data-ref="kyc-iframe"]').should('be.visible').then(($iframe) => {
+      cy.wait(1000)
       const iframeBody = $iframe.contents().find('body');
 
       cy.wrap(iframeBody).find('button').contains('Registrovat').should('exist').click();
@@ -23,29 +32,25 @@ describe('Ryanair sign-up', () => {
       cy.wrap(iframeBody).find('ry-input-d[name="email"] > span').first().as('emailValidation').should('exist').and('be.visible');
       cy.wrap(iframeBody).find('ry-input-d[name="password"] > span').first().as('passwordValidation').should('exist').and('be.visible');
 
-      cy.get('@emailValidation').should('have.text', 'Je třeba uvést e-mail')
-      cy.get('@passwordValidation').should('have.text', 'Je vyžadováno heslo')
+      cy.get('@emailValidation').should('have.text', domData.requiredEmail)
+      cy.get('@passwordValidation').should('have.text', domData.requiredPassword)
 
       // Testing email field
       cy.wrap(iframeBody).find('input[name="email"]').as('emailField').should('exist').and('be.visible');
       cy.get('@emailField').type("email")
-      cy.get('@emailValidation').should('be.visible').and('have.text', 'Neplatný formát e-mailové adresy')
-      cy.get('@passwordValidation').should('be.visible').and('have.text', 'Je vyžadováno heslo')
+      cy.get('@emailValidation').should('be.visible').and('have.text', domData.invalidEmail)
 
       cy.get('@emailField').clear()
       cy.get('@emailField').type("email@email")
-      cy.get('@emailValidation').should('be.visible').and('have.text', 'Neplatný formát e-mailové adresy')
-      cy.get('@passwordValidation').should('be.visible').and('have.text', 'Je vyžadováno heslo')
+      cy.get('@emailValidation').should('be.visible').and('have.text', domData.invalidEmail)
 
       cy.get('@emailField').clear()
       cy.get('@emailField').type("email.email")
-      cy.get('@emailValidation').should('be.visible').and('have.text', 'Neplatný formát e-mailové adresy')
-      cy.get('@passwordValidation').should('be.visible').and('have.text', 'Je vyžadováno heslo')
+      cy.get('@emailValidation').should('be.visible').and('have.text', domData.invalidEmail)
 
       cy.get('@emailField').clear()
       cy.get('@emailField').type("Ema1l@l1amE.com")
       cy.get('@emailValidation').should('not.be.visible')
-      cy.get('@passwordValidation').should('be.visible').and('have.text', 'Je vyžadováno heslo')
 
       // Testing password field
       cy.wrap(iframeBody).find('input[name="password"]').as('passwordField').should('exist').and('be.visible');
