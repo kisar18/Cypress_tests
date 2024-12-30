@@ -9,35 +9,35 @@ Přidat:
 
 describe('Ryanair sign-up', () => {
   it('Sign up', () => {
-    cy.visit('https://www.ryanair.com/cz/cs'); // Takdy dát do fixtures možná??
+    cy.visit('https://www.ryanair.com/cz/cs') // Taky dát do fixtures možná??
 
     // Decline cookies
-    cy.get('.cookie-popup-with-overlay__buttons').find('button').contains(domData.declineCookies).should('exist').click();
+    cy.get('.cookie-popup-with-overlay__buttons').find('button').contains(domData.declineCookies).should('exist').click()
 
     // Title check
-    cy.title().should('eq',domData.title);
+    cy.title().should('eq',domData.title)
 
-    cy.get('ry-log-in-button > button').should('exist').click();
+    cy.get('ry-log-in-button > button').should('exist').click()
 
     // Handle iframe
     cy.get('iframe[data-ref="kyc-iframe"]').should('be.visible').then(($iframe) => {
       cy.wait(1000)
-      const iframeBody = $iframe.contents().find('body');
+      const iframeBody = $iframe.contents().find('body')
 
-      cy.wrap(iframeBody).find('button').contains('Registrovat').should('exist').click();
-      cy.wrap(iframeBody).find('button').contains('Vytvořit účet').as('createAccount').should('exist').and('be.visible');
+      cy.wrap(iframeBody).find('button').contains('Registrovat').should('exist').click()
+      cy.wrap(iframeBody).find('button').contains('Vytvořit účet').as('createAccount').should('exist').and('be.visible')
 
       // Empty fields
       cy.get('@createAccount').click()
 
-      cy.wrap(iframeBody).find('ry-input-d[name="email"] > span').first().as('emailValidation').should('exist').and('be.visible');
-      cy.wrap(iframeBody).find('ry-input-d[name="password"] > span').first().as('passwordValidation').should('exist').and('be.visible');
+      cy.wrap(iframeBody).find('ry-input-d[name="email"] > span').first().as('emailValidation').should('exist').and('be.visible')
+      cy.wrap(iframeBody).find('ry-input-d[name="password"] > span').first().as('passwordValidation').should('exist').and('be.visible')
 
       cy.get('@emailValidation').should('have.text', domData.requiredEmail)
       cy.get('@passwordValidation').should('have.text', domData.requiredPassword)
 
       // Testing email field
-      cy.wrap(iframeBody).find('input[name="email"]').as('emailField').should('exist').and('be.visible');
+      cy.wrap(iframeBody).find('input[name="email"]').as('emailField').should('exist').and('be.visible')
       cy.get('@emailField').type("email")
       cy.get('@emailValidation').should('be.visible').and('have.text', domData.invalidEmail)
 
@@ -54,7 +54,7 @@ describe('Ryanair sign-up', () => {
       cy.get('@emailValidation').should('not.be.visible')
 
       // Testing password field
-      cy.wrap(iframeBody).find('input[name="password"]').as('passwordField').should('exist').and('be.visible');
+      cy.wrap(iframeBody).find('input[name="password"]').as('passwordField').should('exist').and('be.visible')
       cy.get('@passwordField').type("passwd")
       cy.get('@passwordValidation').should('not.be.visible')
 
