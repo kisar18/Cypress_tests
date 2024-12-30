@@ -1,9 +1,10 @@
-import domData from '../fixtures/example.json';
+import domData from '../fixtures/ryanair.json';
 
 /*
+Useful command for git: git config core.autocrlf true
+
 Přidat:
 - run mode, aby to zkusilo 2 krat
-- upravit config aby byly testy typu ".spec.js"
 */ 
 
 describe('Ryanair sign-up', () => {
