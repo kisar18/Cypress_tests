@@ -8,8 +8,13 @@ Přidat:
 */ 
 
 describe('Ryanair sign-up', () => {
-  it('Sign up', () => {
-    cy.visit('https://www.ryanair.com/cz/cs') // Taky dát do fixtures možná??
+  it('Sign up', {
+    retries: {
+      runMode: 1,
+      openMode: 1
+    }
+  }, () => {
+    cy.visit('https://www.ryanair.com/cz/cs')
 
     // Decline cookies
     cy.get('.cookie-popup-with-overlay__buttons').find('button').contains(domData.declineCookies).should('exist').click()

@@ -7,15 +7,15 @@ Přidat:
 - run mode, aby to zkusilo 2 krat
 */ 
 
-describe('Booking sign-up', () => {
-  it('Sign up', () => {
+describe('Booking', () => {
+  it('Sorting', () => {
     cy.visit('https://www.booking.com')
 
     // Decline cookies
-    cy.get('#onetrust-reject-all-handler').should('exist').click()
+    cy.get('#onetrust-reject-all-handler').should('exist', { timeout: 20000 }).click()
 
     // Decline login
-    cy.get('[role="dialog"]').find('button').should('exist').click()
+    cy.get('[role="dialog"]').find('button').should('exist', { timeout: 20000 }).click()
 
     // Title check
     cy.title().should('eq',domData.title)
@@ -48,5 +48,28 @@ describe('Booking sign-up', () => {
     cy.get('@searchButton').click()
     cy.title().should('match', new RegExp(domData.destination))
     cy.get('div[data-results-container="1"]').as('results').should('exist')
-  });
-});
+
+    // Testing sorting
+    cy.get('[data-testid="sorters-dropdown-trigger"]').as('sortingDropdown').should('exist')
+    cy.get('@sortingDropdown').click({ force: true })
+    cy.get('[data-testid="sorters-dropdown"]').as('sortingOptions').should('exist')
+    cy.get('[data-id="price"]').as('lowestPriceFirst').should('exist')
+    cy.get('@lowestPriceFirst').click()
+
+    cy.get('[data-testid="property-card"]') // Nahraď '.container' a '.item' správnými selektory
+      .then(($items) => {
+        // Omezit na první 3 elementy
+        const firstThreeItems = $items.slice(0, 3)
+
+        // Extrahovat ceny a převést je na čísla
+        const prices = [...firstThreeItems].map((item) => {
+          const priceText = Cypress.$(item).find('[data-testid="price-and-discounted-price"]').text() // Nahraď '.price' správným selektorem
+          return parseFloat(priceText.replace(/[^\d.-]/g, '')) // Odstraní symboly jako "Kč", "$" apod.
+        });
+
+        // Zkontrolovat, zda jsou ceny seřazeny od nejnižší po nejvyšší
+        const sortedPrices = [...prices].sort((a, b) => a - b)
+        expect(prices).to.deep.equal(sortedPrices)
+      })
+  })
+})
