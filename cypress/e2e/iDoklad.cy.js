@@ -1,5 +1,6 @@
 import loginData from '../fixtures/iDoklad/login.json'
 import contacts from '../fixtures/iDoklad/contacts.json'
+import domData from '../fixtures/iDoklad/domData.json'
 
 describe('i-Doklad', () => {
   beforeEach(() => {
@@ -7,24 +8,17 @@ describe('i-Doklad', () => {
       statusCode: 403,
     }).as('blockClarity')
 
-    cy.visit('https://app.idoklad.cz/Account/Login', { timeout: 10000 })
+    cy.visit('https://app.idoklad.cz/Account/Login', { timeout: 15000 })
 
     // Login
-    cy.get('.login-wrapper > .row > div > input').as('email').should('exist')
-    cy.get('@email').type(loginData.email)
-    cy.get('.login-wrapper > :nth-child(3) > div > div > input').as('password').should('exist')
-    cy.get('@password').type(loginData.password)
-    cy.get('.login-wrapper > :nth-child(4) > div > button').as('loginButton').should('exist')
-    cy.intercept('POST', '**/api/Account/Login').as('loginTime')
-    cy.get('@loginButton').click()
-    cy.wait('@loginTime', { timeout: 5000 })
+    cy.login(loginData.email, loginData.password)
 
     // Close tip dialog
     cy.get('.dialog-buttons > div > button').as('closeTipButton').should('exist')
     cy.get('@closeTipButton').click()
   })
 
-  it.only('Create contact', {
+  it('Create contact', {
     //retries: 1,
     //runMode: 1
   }, () => {
@@ -58,18 +52,30 @@ describe('i-Doklad', () => {
     cy.get('[data-ui-id="csw-toast-message"]').should('be.visible').and('contain', contacts[0].name)
   })
 
-  it('Edit contact', {
+  it('Edit first contact', {
     //retries: 1,
     //runMode: 1
   }, () => {
-    // Go to contacts
-    cy.intercept('GET', '**/api/Contact/ReadAjax**').as('getContactsTime')
+
+    // Go to contacts list
+    cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
     cy.get('[data-ui-id="csw-side-menu-address-book"]').should('exist').click()
-    cy.wait('@getContactsTime')
+    cy.wait('@getContactsPageTime', { timeout: 5000 })
+
+    // Check if there is atleast one existing contact
+    cy.get('body').then(($body) => {
+      if ($body.find('button[data-ui-id="csw-empty-list-new-item"]').length > 0) {
+        cy.addEmptyContact(contacts[0])
+      }
+    })
 
     // Edit contact
-    cy.get('[data-ui-id="csw-row-action-edit"]').as('editContact').should('exist')
-    cy.get('@editContact').click()
+    cy.get('.k-grid-container > div > div > table[role="presentation"]').as('contactsTable').should('exist')
+    cy.get('@contactsTable').find('tr').first().as('selectedContact').should('exist')
+    cy.get('@selectedContact').within(() => {
+      cy.get('[data-ui-id="csw-row-action-edit"]').as('editContact').should('exist')
+      cy.get('@editContact').click()
+    })
 
     cy.get('[name="CountryId"]').parent().find('button').as('country').should('exist')
     cy.get('@country').click()
@@ -94,29 +100,43 @@ describe('i-Doklad', () => {
     cy.intercept('POST', '**/api/Contact/Update').as('saveContactTime')
     cy.get('@saveContact').click()
     cy.wait('@saveContactTime')
+    cy.get('.errors-wrapper').should('not.exist')
+    cy.get('[data-ui-id="csw-toast-message"]').should('be.visible').and('contain', domData.contactEdited)
   })
 
-  it('Delete contact', {
+  it('Delete first contact', {
     //retries: 1,
     //runMode: 1
   }, () => {
 
-    // Go to contacts
-    cy.intercept('GET', '**/api/Contact/ReadAjax**').as('getContactsTime')
+    // Go to contacts list
+    cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
     cy.get('[data-ui-id="csw-side-menu-address-book"]').should('exist').click()
-    cy.wait('@getContactsTime')
+    cy.wait('@getContactsPageTime', { timeout: 5000 })
+
+    // Check if there is atleast one existing contact
+    cy.get('body').then(($body) => {
+      if ($body.find('button[data-ui-id="csw-empty-list-new-item"]').length > 0) {
+        cy.addEmptyContact(contacts[0])
+      }
+    })
     
     // Delete contact
-    cy.get('[data-ui-id="csw-company-name"]').as('myContact').should('have.length', 1)
-    cy.get('@myContact').should('contain', contacts[1].name)
-    cy.get('[data-ui-id="csw-row-action-show-more-action"]').as('moreActions').should('exist')
-    cy.get('@moreActions').click()
+    cy.get('.k-grid-container > div > div > table[role="presentation"]').as('contactsTable').should('exist')
+    cy.get('@contactsTable').find('tr').first().as('selectedContact').should('exist')
+
+    cy.get('@selectedContact').within(() => {
+      cy.get('[data-ui-id="csw-row-action-show-more-action"]').as('moreActions').should('exist')
+      cy.get('@moreActions').click()
+    })
+    
     cy.get('[data-ui-id="csw-row-action-delete"]').as('deleteContact').should('exist')
     cy.get('@deleteContact').click()
+
     cy.intercept('POST', '**/api/Contact/DeleteRecords').as('deleteContactTime')
     cy.get('[data-ui-id="csw-dialog-confirm"]').should('exist').click()
     cy.wait('@deleteContactTime')
 
-    cy.get('[data-ui-id="csw-grid"]').find('span').contains('Seznam neobsahuje žádné položky').should('exist')
+    cy.get('[data-ui-id="csw-toast-message"]').should('be.visible').and('contain', domData.contactDeleted)
   })
 })

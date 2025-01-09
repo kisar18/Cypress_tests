@@ -17,7 +17,7 @@
 import './commands'
 
 // Alternatively you can use CommonJS syntax:
-// require('./commands')
+require('./commands')
 
 beforeEach(() => {
   cy.viewport(1280, 720) // Nastaví výchozí velikost pro všechny testy
