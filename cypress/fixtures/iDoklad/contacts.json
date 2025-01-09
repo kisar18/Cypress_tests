@@ -1,0 +1,20 @@
+[
+  {
+    "countrySearchValue": "špa",
+    "country": "Španělsko",
+    "name": "Sala gold",
+    "identificationNumber": "2712022",
+    "city": "Málaga",
+    "street": "Navarro Ledesma",
+    "postalCode": 29010
+  },
+  {
+    "countrySearchValue": "řec",
+    "country": "Řecko",
+    "name": "Fredo capuchino",
+    "identificationNumber": "542 48",
+    "city": "Thessaloniki",
+    "street": "Tsimiski",
+    "postalCode": 29010
+  }
+]

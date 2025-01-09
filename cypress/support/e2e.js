@@ -22,3 +22,10 @@ import './commands'
 beforeEach(() => {
   cy.viewport(1280, 720) // Nastaví výchozí velikost pro všechny testy
 })
+
+Cypress.on('uncaught:exception', (err) => {
+  // Ignoruje chybu ResizeObserver
+  if (err.message.includes('ResizeObserver loop completed with undelivered notifications')) {
+    return false
+  }
+})
