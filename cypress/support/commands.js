@@ -15,11 +15,11 @@ Cypress.Commands.add('getByDataUiId', (data_ui_id) => {
 })
 
 Cypress.Commands.add('login', (email, password) => {
-  cy.get('.login-wrapper > .row > div > input').as('email').should('exist')
+  cy.getByDataUiId('csw-username').as('email').should('exist')
   cy.get('@email').type(email)
-  cy.get('.login-wrapper > :nth-child(3) > div > div > input').as('password').should('exist')
+  cy.getByDataUiId('csw-password').as('password').should('exist')
   cy.get('@password').type(password)
-  cy.get('.login-wrapper > :nth-child(4) > div > button').as('loginButton').should('exist')
+  cy.getByDataUiId('csw-login-button').as('loginButton').should('exist')
   cy.intercept('GET', '**/api/Billing/GetDashboardSubscription').as('loginTime')
   cy.get('@loginButton').click()
   cy.wait('@loginTime', { timeout: 15000 })
