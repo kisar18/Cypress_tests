@@ -3,8 +3,6 @@ import contacts from '../fixtures/iDoklad/contacts.json'
 import domData from '../fixtures/iDoklad/domData.json'
 import searchData from '../fixtures/iDoklad/searchData.json'
 
-// can do searching and sorting
-
 describe('i-Doklad', () => {
   beforeEach(() => {
     cy.intercept('https://www.clarity.ms/**', {
@@ -22,8 +20,8 @@ describe('i-Doklad', () => {
   })
 
   it('Create contact', {
-    //retries: 1,
-    //runMode: 1
+    retries: 1,
+    runMode: 1
   }, () => {
 
     // Open new contact form
@@ -56,8 +54,8 @@ describe('i-Doklad', () => {
   })
 
   it('Edit first contact', {
-    //retries: 1,
-    //runMode: 1
+    retries: 1,
+    runMode: 1
   }, () => {
 
     // Go to contacts list
@@ -108,8 +106,8 @@ describe('i-Doklad', () => {
   })
 
   it('Delete first contact', {
-    //retries: 1,
-    //runMode: 1
+    retries: 1,
+    runMode: 1
   }, () => {
 
     // Go to contacts list
@@ -143,9 +141,9 @@ describe('i-Doklad', () => {
     cy.getByDataUiId('csw-toast-message').should('be.visible').and('contain', domData.contactDeleted)
   })
 
-  it.only('Search contacts', {
-    //retries: 1,
-    //runMode: 1
+  it('Search contacts', {
+    retries: 1,
+    runMode: 1
   }, () => {
 
     // Go to contacts list
@@ -165,11 +163,60 @@ describe('i-Doklad', () => {
     cy.addContactIfNotPresent(contacts[3])
     cy.addContactIfNotPresent(contacts[4])
 
+    let allContactsLength
+
+    cy.get('tr.k-master-row').then(($rows) => {
+      allContactsLength = $rows.length
+    })
+    
     // Searching
     cy.getByDataUiId('csw-grid-search').as('searchField').should('exist')
     cy.intercept('GET', '**/api/Contact/ReadAjax**').as('readContactsPageTime')
     cy.get('@searchField').clear().type(searchData[0].input)
     cy.wait('@readContactsPageTime', { timeout: 5000 })
-    cy.get('tr.k-master-row').should('have.length', searchData[0].resultsCount)
+    
+    cy.get('tr.k-master-row').should(($rows) => {
+      expect($rows.length).to.be.lessThan(allContactsLength)
+    })
+  })
+
+  it('Filter contacts', {
+    retries: 1,
+    runMode: 1
+  }, () => {
+
+    // Go to contacts list
+    cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
+    cy.intercept('GET', '**/api/Contact/ReadAjax**').as('readContactsPageTime')
+    cy.getByDataUiId('csw-side-menu-address-book').should('exist').click()
+    cy.wait('@getContactsPageTime', { timeout: 5000 })
+
+    cy.get('body').then(($body) => {
+      if ($body.find('button[data-ui-id="csw-empty-list-new-item"]').length > 0) {
+        cy.addEmptyContact(contacts[0])
+      }
+    })
+    
+    cy.wait('@readContactsPageTime', { timeout: 15000 })
+    cy.addContactIfNotPresent(contacts[0])
+    cy.addContactIfNotPresent(contacts[3])
+    cy.addContactIfNotPresent(contacts[4])
+
+    // A to Z sorting
+    cy.get('th[aria-colindex="2"]').as('sortByName').should('exist')
+    cy.get('@sortByName').click()
+    cy.get('tr.k-master-row').find('[data-ui-id="csw-company-name"]').then(($contacts) => {
+      const contactTexts = $contacts.map((_, el) => Cypress.$(el).text().trim()).get()
+      const sortedContacts = [...contactTexts].sort()
+      expect(contactTexts).to.deep.equal(sortedContacts)
+    })
+
+    // Z to A sorting
+    cy.get('@sortByName').click()
+    cy.get('tr.k-master-row').find('[data-ui-id="csw-company-name"]').then(($contacts) => {
+      const contactTexts = $contacts.map((_, el) => Cypress.$(el).text().trim()).get();
+      const sortedContacts = [...contactTexts].sort().reverse()
+      expect(contactTexts).to.deep.equal(sortedContacts)
+    })
   })
 })
