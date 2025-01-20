@@ -45,10 +45,29 @@ describe('i-Doklad', () => {
     cy.get('@companyName').type(contacts[0].name)
     cy.get('[name="IdentificationNumber"]').as('identificationNumber').should('exist')
     cy.get('@identificationNumber').type(contacts[0].identificationNumber)
-
+    
+    // Check if there is same existing contact
+    cy.intercept('GET', `**/api/Contact/CheckEmailDuplicity?contactEmail=&contactIn=${contacts[0].identificationNumber}&contactId=0`).as('checkDupliciteIcoTime')
     cy.intercept('POST', '**/api/Contact/Create').as('saveContactTime')
+
     cy.get('@saveContact').click()
-    cy.wait('@saveContactTime')
+    cy.wait('@checkDupliciteIcoTime')
+
+    cy.get('@saveContact').then(($btn) => {
+      const btnText = $btn.text().trim()
+  
+      if (btnText === domData.saveDuplicateContact) {
+        // Duplicate contact found
+        cy.log('Duplicate found, proceeding with "Přesto uložit"')
+        cy.get('@saveContact').click({ force: true })
+        cy.wait('@saveContactTime', { timeout: 15000 })
+      } else {
+        // No duplicate found
+        cy.log('No duplicate found, proceeding with "Uložit"')
+        cy.wait('@saveContactTime')
+      }
+    })
+
     cy.get('.errors-wrapper').should('not.exist')
     cy.getByDataUiId('csw-toast-message').should('be.visible').and('contain', contacts[0].name)
   })
