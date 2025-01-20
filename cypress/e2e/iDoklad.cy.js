@@ -58,15 +58,10 @@ describe('i-Doklad', () => {
   
       if (btnText === domData.saveDuplicateContact) {
         // Duplicate contact found
-        cy.log('Duplicate found, proceeding with "Přesto uložit"')
         cy.get('@saveContact').click({ force: true })
-        cy.wait('@saveContactTime', { timeout: 15000 })
-      } else {
-        // No duplicate found
-        cy.log('No duplicate found, proceeding with "Uložit"')
-        cy.wait('@saveContactTime')
       }
     })
+    cy.wait('@saveContactTime', { timeout: 15000 })
 
     cy.get('.errors-wrapper').should('not.exist')
     cy.getByDataUiId('csw-toast-message').should('be.visible').and('contain', contacts[0].name)
