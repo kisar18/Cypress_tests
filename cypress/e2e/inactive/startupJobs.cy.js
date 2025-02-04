@@ -1,7 +1,6 @@
 
-
 describe('StartupJobs', () => {
-  it('Sorting', {
+  it.skip('Sorting', {
     retries: 1,
     runMode: 1
   }, () => {

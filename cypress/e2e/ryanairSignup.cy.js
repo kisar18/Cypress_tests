@@ -19,14 +19,14 @@ describe('Ryanair sign-up', () => {
     // Title check
     cy.title().should('eq',domData.title)
 
-    cy.get('ry-log-in-button > button').should('exist').click()
+    cy.get('button').contains(' Portál myRyanair ').should('exist').click()
 
     // Handle iframe
-    cy.get('iframe[data-ref="kyc-iframe"]').should('be.visible').then(($iframe) => {
+    cy.get('iframe[data-ref="kyc-iframe"]').should('be.visible').invoke('show').then(($iframe) => {
       cy.wait(1000)
       const iframeBody = $iframe.contents().find('body')
 
-      cy.wrap(iframeBody).find('button').contains('Registrovat').should('exist').click()
+      cy.wrap(iframeBody).find('button').should('be.visible').contains(' Registrovat ').should('exist').click()
       cy.wrap(iframeBody).find('button').contains('Vytvořit účet').as('createAccount').should('exist').and('be.visible')
 
       // Empty fields

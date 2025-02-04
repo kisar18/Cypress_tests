@@ -1,4 +1,4 @@
-import domData from '../fixtures/booking.json';
+import domData from '../../fixtures/booking.json';
 
 /*
 Useful command for git: git config core.autocrlf true
@@ -8,7 +8,7 @@ Přidat:
 */ 
 
 describe('Booking', () => {
-  it('Sorting', () => {
+  it.skip('Sorting', () => {
     cy.visit('https://www.booking.com')
 
     // Decline cookies
