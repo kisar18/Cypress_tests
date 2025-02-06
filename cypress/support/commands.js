@@ -15,14 +15,22 @@ Cypress.Commands.add('getByDataUiId', (data_ui_id) => {
 })
 
 Cypress.Commands.add('login', (email, password) => {
-  cy.getByDataUiId('csw-username').as('email').should('exist')
-  cy.get('@email').type(email)
-  cy.getByDataUiId('csw-password').as('password').should('exist')
-  cy.get('@password').type(password)
-  cy.getByDataUiId('csw-login-button').as('loginButton').should('exist')
-  cy.intercept('GET', '**/api/Billing/GetDashboardSubscription').as('loginTime')
-  cy.get('@loginButton').click()
-  cy.wait('@loginTime', { timeout: 15000 })
+  cy.session([email, password], () => {
+
+    cy.visit('https://app.idoklad.cz/Account/Login', { timeout: 15000 })
+    cy.getByDataUiId('csw-username').as('email').should('exist')
+    cy.get('@email').type(email)
+    cy.getByDataUiId('csw-password').as('password').should('exist')
+    cy.get('@password').type(password)
+    cy.getByDataUiId('csw-login-button').as('loginButton').should('exist')
+    cy.intercept('GET', '**/api/Billing/GetDashboardSubscription').as('loginTime')
+    cy.get('@loginButton').click()
+    cy.wait('@loginTime', { timeout: 15000 })
+
+    // Close tip dialog
+    cy.get('.dialog-buttons > div > button').as('closeTipButton').should('exist')
+    cy.get('@closeTipButton').click()
+  })
 })
 
 Cypress.Commands.add('addEmptyContact', (contact) => {
@@ -35,23 +43,10 @@ Cypress.Commands.add('addEmptyContact', (contact) => {
   cy.get('[name="CompanyName"]').as('companyName').should('exist')
   cy.get('@companyName').type(contact.name)
   
-  cy.getByDataUiId('csw-save-new-contact').as('saveContact').should('exist')
+  cy.getByDataUiId('csw-save-new-contact').as('saveNewContact').should('exist')
   cy.intercept('POST', '**/api/Contact/Create').as('saveContactTime')
-  cy.get('@saveContact').click()
-  cy.wait('@saveContactTime')
+  cy.get('@saveNewContact').click()
   cy.get('.errors-wrapper').should('not.exist')
   cy.getByDataUiId('csw-toast-message').should('be.visible').and('contain', contact.name)
-})
-
-Cypress.Commands.add('addContactIfNotPresent', (contact) => {
-  cy.get('body').then(($body) => {
-    const existingContacts = $body.find('[data-ui-id="csw-company-name"]').map((_, row) => {
-      return Cypress.$(row).text().trim()
-    }).get()
-
-    console.log(existingContacts)
-    if (!existingContacts.includes(contact.name)) {
-      cy.addEmptyContact(contact)
-    }
-  })
+  cy.wait('@saveContactTime')
 })

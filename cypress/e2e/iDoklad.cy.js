@@ -3,26 +3,51 @@ import contacts from '../fixtures/iDoklad/contacts.json'
 import domData from '../fixtures/iDoklad/domData.json'
 import searchData from '../fixtures/iDoklad/searchData.json'
 
+// create new contact a create duplicate contact - 2 tests
+
 describe('i-Doklad', () => {
   beforeEach(() => {
     cy.intercept('https://www.clarity.ms/**', {
       statusCode: 403,
     }).as('blockClarity')
 
-    cy.visit('https://app.idoklad.cz/Account/Login', { timeout: 15000 })
-
     // Login
     cy.login(loginData.email, loginData.password)
 
-    // Close tip dialog
-    cy.get('.dialog-buttons > div > button').as('closeTipButton').should('exist')
-    cy.get('@closeTipButton').click()
+    cy.visit('https://app.idoklad.cz/', { timeout: 15000 })
+
+    cy.addEmptyContact(contacts[0])
+    cy.addEmptyContact(contacts[3])
+    cy.addEmptyContact(contacts[4])
+
+    cy.intercept('GET', '**/api/Dashboard/UnpaidInvoices**').as('loadHomeTime')
+    cy.getByDataUiId('csw-side-menu-home').should('exist').click()
+    cy.wait('@loadHomeTime')
+  })
+
+  afterEach(() => {
+    // Go to contacts list
+    cy.visit('https://app.idoklad.cz/', { timeout: 15000 })
+    
+    cy.intercept('GET', '**/api/Contact/ReadAjax**').as('readContactsStartTime')
+    cy.getByDataUiId('csw-side-menu-address-book').should('exist').click()
+    cy.wait('@readContactsStartTime', { timeout: 5000 })
+
+    // Delete all contacts
+    cy.get('thead[role="presentation"] > tr > th > input').should('exist').click()
+    cy.get('[data-ui-id="csw-grid-delete"] > button').should('exist').click()
+
+    cy.intercept('GET', '**/api/Contact/ReadAjax**').as('readContactsEndTime')
+    cy.getByDataUiId('csw-dialog-confirm').should('exist').click()
+    cy.wait('@readContactsEndTime', { timeout: 5000 })
   })
 
   it('Create contact', {
     retries: 1,
     runMode: 1
   }, () => {
+
+    cy.visit('https://app.idoklad.cz/', { timeout: 15000 })
 
     // Open new contact form
     cy.getByDataUiId('csw-new-item').click()
@@ -31,40 +56,26 @@ describe('i-Doklad', () => {
     cy.get('.heading-wrapper').find('h1').as('sectionTitle').should('exist')
     cy.get('@sectionTitle').contains('Nový kontakt')
 
-    cy.getByDataUiId('csw-save-new-contact').as('saveContact').should('exist')
-    cy.get('@saveContact').click()
+    cy.getByDataUiId('csw-save-new-contact').as('saveNewContact').should('exist')
+    cy.get('@saveNewContact').click()
     cy.get('.errors-wrapper').as('validations').should('be.visible')
 
     cy.get('[name="CountryId"]').parent().find('button').as('country').should('exist')
     cy.get('@country').click()
     cy.get('.k-list-filter').as('countrySearch').should('exist')
-    cy.get('@countrySearch').type(contacts[0].countrySearchValue)
+    cy.get('@countrySearch').type(contacts[2].countrySearchValue)
     cy.get('ul[role="listbox"]').find('li').as('targetCountry').should('have.length', 1)
-    cy.get('@targetCountry').should('contain', contacts[0].country).click()
+    cy.get('@targetCountry').should('contain', contacts[2].country).click()
     cy.get('[name="CompanyName"]').as('companyName').should('exist')
-    cy.get('@companyName').type(contacts[0].name)
+    cy.get('@companyName').type(contacts[2].name)
     cy.get('[name="IdentificationNumber"]').as('identificationNumber').should('exist')
-    cy.get('@identificationNumber').type(contacts[0].identificationNumber)
-    
-    // Check if there is same existing contact
-    cy.intercept('GET', `**/api/Contact/CheckEmailDuplicity?contactEmail=&contactIn=${contacts[0].identificationNumber}&contactId=0`).as('checkDupliciteIcoTime')
-    cy.intercept('POST', '**/api/Contact/Create').as('saveContactTime')
+    cy.get('@identificationNumber').type(contacts[2].identificationNumber)
 
-    cy.get('@saveContact').click()
-    cy.wait('@checkDupliciteIcoTime')
-
-    cy.get('@saveContact').then(($btn) => {
-      const btnText = $btn.text().trim()
-  
-      if (btnText === domData.saveDuplicateContact) {
-        // Duplicate contact found
-        cy.get('@saveContact').click({ force: true })
-      }
-    })
-    cy.wait('@saveContactTime', { timeout: 15000 })
-
+    cy.intercept('GET', '**/api/Contact/ReadAjax**').as('readContactsPageTime')
+    cy.get('@saveNewContact').click()
     cy.get('.errors-wrapper').should('not.exist')
-    cy.getByDataUiId('csw-toast-message').should('be.visible').and('contain', contacts[0].name)
+    cy.getByDataUiId('csw-toast-message').should('be.visible').and('contain', contacts[2].name)
+    cy.wait('@readContactsPageTime', { timeout: 5000 })
   })
 
   it('Edit first contact', {
@@ -72,17 +83,12 @@ describe('i-Doklad', () => {
     runMode: 1
   }, () => {
 
+    cy.visit('https://app.idoklad.cz/', { timeout: 15000 })
+    
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
     cy.getByDataUiId('csw-side-menu-address-book').should('exist').click()
     cy.wait('@getContactsPageTime', { timeout: 5000 })
-
-    // Check if there is atleast one existing contact
-    cy.get('body').then(($body) => {
-      if ($body.find('button[data-ui-id="csw-empty-list-new-item"]').length > 0) {
-        cy.addEmptyContact(contacts[0])
-      }
-    })
 
     // Edit contact
     cy.get('.k-grid-container > div > div > table[role="presentation"]').as('contactsTable').should('exist')
@@ -111,12 +117,12 @@ describe('i-Doklad', () => {
     cy.get('@city').clear().type(contacts[1].city)
 
     // Save contact
-    cy.getByDataUiId('csw-save-new-contact').as('saveContact').should('exist')
-    cy.intercept('POST', '**/api/Contact/Update').as('saveContactTime')
-    cy.get('@saveContact').click()
-    cy.wait('@saveContactTime')
+    cy.getByDataUiId('csw-save-new-contact').as('saveNewContact').should('exist')
+    cy.intercept('GET', '**/api/Contact/ReadAjax**').as('readContactsPageTime')
+    cy.get('@saveNewContact').click()
     cy.get('.errors-wrapper').should('not.exist')
     cy.getByDataUiId('csw-toast-message').should('be.visible').and('contain', domData.contactEdited)
+    cy.wait('@readContactsPageTime', { timeout: 5000 })
   })
 
   it('Delete first contact', {
@@ -124,17 +130,12 @@ describe('i-Doklad', () => {
     runMode: 1
   }, () => {
 
+    cy.visit('https://app.idoklad.cz/', { timeout: 15000 })
+
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
     cy.getByDataUiId('csw-side-menu-address-book').should('exist').click()
     cy.wait('@getContactsPageTime', { timeout: 5000 })
-
-    // Check if there is atleast one existing contact
-    cy.get('body').then(($body) => {
-      if ($body.find('button[data-ui-id="csw-empty-list-new-item"]').length > 0) {
-        cy.addEmptyContact(contacts[0])
-      }
-    })
     
     // Delete contact
     cy.get('.k-grid-container > div > div > table[role="presentation"]').as('contactsTable').should('exist')
@@ -148,11 +149,10 @@ describe('i-Doklad', () => {
     cy.getByDataUiId('csw-row-action-delete').as('deleteContact').should('exist')
     cy.get('@deleteContact').click()
 
-    cy.intercept('POST', '**/api/Contact/DeleteRecords').as('deleteContactTime')
+    cy.intercept('GET', '**/api/Contact/ReadAjax**').as('readContactsPageTime')
     cy.getByDataUiId('csw-dialog-confirm').should('exist').click()
-    cy.wait('@deleteContactTime')
-
     cy.getByDataUiId('csw-toast-message').should('be.visible').and('contain', domData.contactDeleted)
+    cy.wait('@readContactsPageTime', { timeout: 5000 })
   })
 
   it('Search contacts', {
@@ -160,22 +160,12 @@ describe('i-Doklad', () => {
     runMode: 1
   }, () => {
 
+    cy.visit('https://app.idoklad.cz/', { timeout: 15000 })
+
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
-    cy.intercept('GET', '**/api/Contact/ReadAjax**').as('readContactsPageTime')
     cy.getByDataUiId('csw-side-menu-address-book').should('exist').click()
     cy.wait('@getContactsPageTime', { timeout: 5000 })
-
-    cy.get('body').then(($body) => {
-      if ($body.find('button[data-ui-id="csw-empty-list-new-item"]').length > 0) {
-        cy.addEmptyContact(contacts[0])
-      }
-    })
-    
-    cy.wait('@readContactsPageTime', { timeout: 15000 })
-    cy.addContactIfNotPresent(contacts[0])
-    cy.addContactIfNotPresent(contacts[3])
-    cy.addContactIfNotPresent(contacts[4])
 
     let allContactsLength
 
@@ -199,22 +189,12 @@ describe('i-Doklad', () => {
     runMode: 1
   }, () => {
 
+    cy.visit('https://app.idoklad.cz/', { timeout: 15000 })
+
     // Go to contacts list
-    cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
-    cy.intercept('GET', '**/api/Contact/ReadAjax**').as('readContactsPageTime')
+    cy.intercept('GET', '**/api/Contact/ReadAjax**').as('getContactsPageTime')
     cy.getByDataUiId('csw-side-menu-address-book').should('exist').click()
     cy.wait('@getContactsPageTime', { timeout: 5000 })
-
-    cy.get('body').then(($body) => {
-      if ($body.find('button[data-ui-id="csw-empty-list-new-item"]').length > 0) {
-        cy.addEmptyContact(contacts[0])
-      }
-    })
-    
-    cy.wait('@readContactsPageTime', { timeout: 15000 })
-    cy.addContactIfNotPresent(contacts[0])
-    cy.addContactIfNotPresent(contacts[3])
-    cy.addContactIfNotPresent(contacts[4])
 
     // A to Z sorting
     cy.get('th[aria-colindex="2"]').as('sortByName').should('exist')
@@ -228,7 +208,7 @@ describe('i-Doklad', () => {
     // Z to A sorting
     cy.get('@sortByName').click()
     cy.get('tr.k-master-row').find('[data-ui-id="csw-company-name"]').then(($contacts) => {
-      const contactTexts = $contacts.map((_, el) => Cypress.$(el).text().trim()).get();
+      const contactTexts = $contacts.map((_, el) => Cypress.$(el).text().trim()).get()
       const sortedContacts = [...contactTexts].sort().reverse()
       expect(contactTexts).to.deep.equal(sortedContacts)
     })
