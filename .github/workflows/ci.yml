@@ -7,14 +7,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set Cypress Environment Variables
-        run: echo "CYPRESS_EXPERIMENTAL_MEMORY_MANAGEMENT=true" >> $GITHUB_ENV
-
       - name: Cypress run
         uses: cypress-io/github-action@v6
-        env:
-          DEBUG: cypress:*
-          
+        
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
