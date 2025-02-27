@@ -19,15 +19,15 @@ describe('Ryanair sign-up', () => {
     // Title check
     cy.title().should('eq',domData.title)
 
-    cy.get('button').contains(' Portál myRyanair ').should('exist').click()
+    cy.get('button').contains(domData.portal).should('exist').click()
 
     // Handle iframe
     cy.get('iframe[data-ref="kyc-iframe"]').should('be.visible').invoke('show').then(($iframe) => {
       cy.wait(1000)
       const iframeBody = $iframe.contents().find('body')
 
-      cy.wrap(iframeBody).find('button').should('be.visible').contains(' Registrovat ').should('exist').click()
-      cy.wrap(iframeBody).find('button').contains('Vytvořit účet').as('createAccount').should('exist').and('be.visible')
+      cy.wrap(iframeBody).find('button').contains(domData.signUpBtn).should('exist').click()
+      cy.wrap(iframeBody).find('button').contains(domData.createAccountBtn).as('createAccount').should('exist')
 
       // Empty fields
       cy.get('@createAccount').click()
@@ -64,6 +64,6 @@ describe('Ryanair sign-up', () => {
       cy.wrap(iframeBody).find('ry-auth-password-validation > :nth-child(4) > :nth-child(1) > :nth-child(1)').as('eightCharactersValidation').should('exist').and('have.class', 'icon--error')
       cy.wrap(iframeBody).find('ry-auth-password-validation > :nth-child(5) > :nth-child(1) > :nth-child(1)').as('oneSmallLetterValidation').should('exist').and('have.class', 'icon--success')
       cy.wrap(iframeBody).find('ry-auth-password-validation > :nth-child(6) > :nth-child(1) > :nth-child(1)').as('oneBigLetterValidation').should('exist').and('have.class', 'icon--error')
-    });
-  });
-});
+    })
+  })
+})
