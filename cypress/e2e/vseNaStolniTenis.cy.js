@@ -1,25 +1,26 @@
 import tables from '../fixtures/vseNaStolniTenis/tables.json'
 import domData from '../fixtures/vseNaStolniTenis/domData.json'
+import languages from '../fixtures/vseNaStolniTenis/languages.json'
 
 Cypress.on('uncaught:exception', (err, runnable) => {
   return false
 })
 
-beforeEach(() => {
-  cy.visit('https://www.vsenastolnitenis.cz/', { timeout: 15000 })
-
-  // Decline cookies
-  cy.get('#consentNone').should('exist').click()
-})
-
 describe('Vse na stolni tenis', () => {
+  beforeEach(() => {
+    cy.visit('https://www.vsenastolnitenis.cz/', { timeout: 15000 })
+  
+    // Decline cookies
+    cy.get('#consentNone').should('exist').click()
+  })
+
   it('Sorting tables by price', {
     retries: 1,
     runMode: 1
   }, () => {
 
     // Tables
-    cy.get('#navBarWithMegaMenu').find('li.nav-item').contains(domData.navItems[1]).should('exist').click({ force: true })
+    cy.get('#navBarWithMegaMenu').find('li.nav-item').contains(domData.categories[1]).should('exist').click({ force: true })
 
     cy.get('[class="product_price asc"]').as('sortByPriceAsc').should('exist')
     cy.get('@sortByPriceAsc').click()
@@ -58,13 +59,73 @@ describe('Vse na stolni tenis', () => {
   }, () => {
 
     // Tables
-    cy.get('#navBarWithMegaMenu').find('li.nav-item').contains(domData.navItems[1]).should('exist').click({ force: true })
+    cy.get('#navBarWithMegaMenu').find('li.nav-item').contains(domData.categories[1]).should('exist').click({ force: true })
 
     cy.get('div[data-name="znacka"] > div > ul > li').contains(tables[0].brand).as('firstBrand').should('exist')
     cy.get('@firstBrand').click()
 
     cy.get('.pp-cat-item > a > .pp-pbody > .pp-titlebox').each(($el) => {
       cy.wrap($el).should('contain.text', tables[0].brand)
+    })
+  })
+
+  it('Check contact info of all stores', {
+    retries: 1,
+    runMode: 1
+  }, () => {
+
+    // Go to contacts page
+    cy.get('#navBarWithDropdown').find('li.nav-item').contains(domData.headerMenuItems[2]).should('exist').click({ force: true })
+
+    // Check the number of stores
+    cy.get('.pp-blog-item').as('stores').should('exist')
+    cy.get('@stores').should('have.length', 6)
+
+    // Check the info of each store
+    cy.get('@stores').each(($el, index) => {
+      cy.wrap($el).should('contain.text', domData.stores[index].name)
+      cy.wrap($el).should('contain.text', domData.stores[index].street)
+      cy.wrap($el).should('contain.text', domData.stores[index].city)
+      cy.wrap($el).invoke('text')
+      .then((text) => {
+        const cleanedText = text.replace(/\s+/g, ' ').trim()
+        expect(cleanedText).to.contain(domData.stores[index].openingHours)
+      })
+    })
+  })
+
+  it('Language translations', {
+    retries: 1,
+    runMode: 1
+  }, () => {
+
+    // Iterate trough all the languages
+    languages.forEach((language, index) => {
+
+      // Check the URL
+      cy.url().should('eq', language.url)
+
+      // Check the title
+      cy.title().should('eq', language.title)
+
+      // Check search field placeholder
+      cy.get('#desktopsearch > form > input[type="search"]').as('searchField').should('exist')
+      cy.get('@searchField').should('have.attr', 'placeholder', language.searchPlaceholder)
+
+      // Check description of the flag image
+      cy.get('#languageChooser').as('flag').should('exist')
+      cy.get('@flag').find('#flag > img').should('have.attr', 'alt', language.flagAlt)
+
+      // Change the language
+      cy.get('@flag').click()
+      cy.get('#languageDropdown').as('otherLanguages').should('be.visible')
+      cy.get('@otherLanguages').find('.btn').should('have.length', languages.length - 1)
+
+      if(index !== languages.length - 1) {
+        cy.intercept('GET', '**/api/v1/widget/translations/lang/**').as('reloadTime')
+        cy.get('@otherLanguages').find('.btn').eq(index).click()
+        cy.wait('@reloadTime')
+      }
     })
   })
 })
