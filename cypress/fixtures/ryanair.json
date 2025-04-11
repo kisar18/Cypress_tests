@@ -6,5 +6,6 @@
   "invalidEmail": "Neplatný formát e-mailové adresy",
   "portal": "Portál myRyanair",
   "signUpBtn": "Registrovat",
-  "createAccountBtn": "Vytvořit účet"
+  "createAccountBtn": "Vytvořit účet",
+  "profileSectionHeader": " Vaše příští rezervace"
 }

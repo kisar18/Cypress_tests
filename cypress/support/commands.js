@@ -50,3 +50,61 @@ Cypress.Commands.add('addEmptyContact', (contact) => {
   cy.getByDataUiId('csw-toast-message').should('be.visible').and('contain', contact.name)
   cy.wait('@saveContactTime')
 })
+
+Cypress.Commands.add('createTempEmail', () => {
+  const domainUrl = 'https://api.mail.tm'
+  const password = 'SuperSecret123!'
+
+  // Get available domains
+  return cy.request(`${domainUrl}/domains`).then((domainRes) => {
+    const domain = domainRes.body['hydra:member'][0].domain
+    const randomName = `user_${Date.now()}`
+    const address = `${randomName}@${domain}`
+
+    // Create an account
+    return cy.request('POST', `${domainUrl}/accounts`, {
+      address,
+      password
+    }).then(() => {
+      // Login and get the token
+      return cy.request('POST', `${domainUrl}/token`, {
+        address,
+        password
+      }).then((loginRes) => {
+        const token = loginRes.body.token
+        return { address, token }
+      })
+    })
+  })
+})
+
+Cypress.Commands.add('waitForEmail', (token, retries = 10) => {
+  if (retries === 0) {
+    throw new Error('E-mail nedorazil ani po několika pokusech')
+  }
+
+  return cy.request({
+    method: 'GET',
+    url: 'https://api.mail.tm/messages',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }).then((res) => {
+    const messages = res.body['hydra:member']
+
+    if (!messages.length) {
+      cy.wait(2000)
+      return cy.waitForEmail(token, retries - 1)
+    }
+
+    const emailId = messages[0].id
+
+    return cy.request({
+      method: 'GET',
+      url: `https://api.mail.tm/messages/${emailId}`,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).then((emailRes) => emailRes.body)
+  })
+})
