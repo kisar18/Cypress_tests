@@ -7,7 +7,7 @@ describe('Ryanair sign-up', () => {
       openMode: 1
     }
   }, () => {
-    cy.visit('https://www.ryanair.com/cz/cs')
+    cy.visit(domData.ryanairUrl)
 
     // Decline cookies
     cy.get('.cookie-popup-with-overlay__buttons')
@@ -85,7 +85,7 @@ describe('Ryanair sign-up', () => {
           cy.log(`Verification code: ${verificationCode}`)
 
           // Fill the verification code
-          cy.get('body').then($body => {
+          cy.get('body').then(() => {
           const selector = 'ry-input-d[formcontrolname="emailVerificationCode"] > div > input'
               
           // Form is inside new iframe
@@ -105,7 +105,7 @@ describe('Ryanair sign-up', () => {
           })
 
           // Check the header on the profile section
-          cy.get('home-booking-details-section').contains(domData.profileSectionHeader).should('exist')
+          cy.get('button.log-out').contains(domData.logoutBtn).should('exist', { timeout: 10000 })
         })
       })
     })
