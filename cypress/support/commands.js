@@ -14,7 +14,7 @@ Cypress.Commands.add('getByDataUiId', (data_ui_id) => {
   cy.get(`[data-ui-id="${data_ui_id}"]`)
 })
 
-Cypress.Commands.add('login', (email, password) => {
+Cypress.Commands.add('iDokladLogin', (email, password) => {
   cy.session([email, password], () => {
 
     cy.visit('https://app.idoklad.cz/Account/Login', { timeout: 15000 })
@@ -31,6 +31,8 @@ Cypress.Commands.add('login', (email, password) => {
     cy.get('.dialog-buttons > div > button').as('closeTipButton').should('exist')
     cy.get('@closeTipButton').click()
   })
+
+  cy.visit('https://app.idoklad.cz/', { timeout: 15000 })
 })
 
 Cypress.Commands.add('addEmptyContact', (contact) => {

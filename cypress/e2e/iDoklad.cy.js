@@ -14,8 +14,6 @@ describe('i-Doklad', () => {
     // Login
     cy.login(loginData.email, loginData.password)
 
-    cy.visit('https://app.idoklad.cz/', { timeout: 15000 })
-
     cy.addEmptyContact(contacts[0])
     cy.addEmptyContact(contacts[3])
     cy.addEmptyContact(contacts[4])
@@ -46,8 +44,6 @@ describe('i-Doklad', () => {
     retries: 1,
     runMode: 1
   }, () => {
-
-    cy.visit('https://app.idoklad.cz/', { timeout: 15000 })
 
     // Open new contact form
     cy.getByDataUiId('csw-new-item').click()
@@ -82,8 +78,6 @@ describe('i-Doklad', () => {
     retries: 1,
     runMode: 1
   }, () => {
-
-    cy.visit('https://app.idoklad.cz/', { timeout: 15000 })
     
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
@@ -130,8 +124,6 @@ describe('i-Doklad', () => {
     runMode: 1
   }, () => {
 
-    cy.visit('https://app.idoklad.cz/', { timeout: 15000 })
-
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
     cy.getByDataUiId('csw-side-menu-address-book').should('exist').click()
@@ -160,8 +152,6 @@ describe('i-Doklad', () => {
     runMode: 1
   }, () => {
 
-    cy.visit('https://app.idoklad.cz/', { timeout: 15000 })
-
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
     cy.getByDataUiId('csw-side-menu-address-book').should('exist').click()
@@ -188,8 +178,6 @@ describe('i-Doklad', () => {
     retries: 1,
     runMode: 1
   }, () => {
-
-    cy.visit('https://app.idoklad.cz/', { timeout: 15000 })
 
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/ReadAjax**').as('getContactsPageTime')
