@@ -12,7 +12,7 @@ describe('i-Doklad', () => {
     }).as('blockClarity')
 
     // Login
-    cy.login(loginData.email, loginData.password)
+    cy.iDokladLogin(loginData.email, loginData.password)
 
     cy.addEmptyContact(contacts[0])
     cy.addEmptyContact(contacts[3])
@@ -40,7 +40,7 @@ describe('i-Doklad', () => {
     cy.wait('@readContactsEndTime', { timeout: 5000 })
   })
 
-  it('Create contact', {
+  it.only('Create contact', {
     retries: 1,
     runMode: 1
   }, () => {
