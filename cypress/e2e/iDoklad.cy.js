@@ -3,7 +3,7 @@ import contacts from '../fixtures/iDoklad/contacts.json'
 import domData from '../fixtures/iDoklad/domData.json'
 import searchData from '../fixtures/iDoklad/searchData.json'
 
-// create new contact a create duplicate contact - 2 tests
+// create new contact a create duplicate contact - 2 tests (maybe)
 
 describe('i-Doklad', () => {
   beforeEach(() => {
