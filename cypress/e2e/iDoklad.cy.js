@@ -40,7 +40,7 @@ describe('i-Doklad', () => {
     cy.wait('@readContactsEndTime', { timeout: 5000 })
   })
 
-  it.only('Create contact', {
+  it('Create contact', {
     retries: 1,
     runMode: 1
   }, () => {
