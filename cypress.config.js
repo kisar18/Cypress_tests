@@ -13,4 +13,4 @@ module.exports = defineConfig({
     experimentalMemoryManagement: true,
     numTestsKeptInMemory: 1
   },
-});
+})
