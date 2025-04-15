@@ -14,10 +14,7 @@ describe('Vse na stolni tenis', () => {
     cy.get('#consentNone').should('exist').click()
   })
 
-  it('Sorting tables by price', {
-    retries: 1,
-    runMode: 1
-  }, () => {
+  it('Sorting tables by price', () => {
 
     // Tables
     cy.get('#navBarWithMegaMenu').find('li.nav-item').contains(domData.categories[1]).should('exist').click({ force: true })
@@ -53,10 +50,7 @@ describe('Vse na stolni tenis', () => {
       })
   })
 
-  it('Filtering tables by brand', {
-    retries: 1,
-    runMode: 1
-  }, () => {
+  it('Filtering tables by brand', () => {
 
     // Tables
     cy.get('#navBarWithMegaMenu').find('li.nav-item').contains(domData.categories[1]).should('exist').click({ force: true })
@@ -69,10 +63,7 @@ describe('Vse na stolni tenis', () => {
     })
   })
 
-  it('Check contact info of all stores', {
-    retries: 1,
-    runMode: 1
-  }, () => {
+  it('Check contact info of all stores', () => {
 
     // Go to contacts page
     cy.get('#navBarWithDropdown').find('li.nav-item').contains(domData.headerMenuItems[2]).should('exist').click({ force: true })
@@ -94,10 +85,7 @@ describe('Vse na stolni tenis', () => {
     })
   })
 
-  it('Language translations', {
-    retries: 1,
-    runMode: 1
-  }, () => {
+  it('Language translations', () => {
 
     // Iterate trough all the languages
     languages.forEach((language, index) => {

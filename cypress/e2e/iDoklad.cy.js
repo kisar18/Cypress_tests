@@ -40,10 +40,7 @@ describe('i-Doklad', () => {
     cy.wait('@readContactsEndTime', { timeout: 5000 })
   })
 
-  it('Create contact', {
-    retries: 1,
-    runMode: 1
-  }, () => {
+  it('Create contact', () => {
 
     // Open new contact form
     cy.getByDataUiId('csw-new-item').click()
@@ -74,10 +71,7 @@ describe('i-Doklad', () => {
     cy.wait('@readContactsPageTime', { timeout: 5000 })
   })
 
-  it('Edit first contact', {
-    retries: 1,
-    runMode: 1
-  }, () => {
+  it('Edit first contact', () => {
     
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
@@ -119,10 +113,7 @@ describe('i-Doklad', () => {
     cy.wait('@readContactsPageTime', { timeout: 5000 })
   })
 
-  it('Delete first contact', {
-    retries: 1,
-    runMode: 1
-  }, () => {
+  it('Delete first contact', () => {
 
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
@@ -147,10 +138,7 @@ describe('i-Doklad', () => {
     cy.wait('@readContactsPageTime', { timeout: 5000 })
   })
 
-  it('Search contacts', {
-    retries: 1,
-    runMode: 1
-  }, () => {
+  it('Search contacts', () => {
 
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
@@ -174,10 +162,7 @@ describe('i-Doklad', () => {
     })
   })
 
-  it('Filter contacts', {
-    retries: 1,
-    runMode: 1
-  }, () => {
+  it('Filter contacts', () => {
 
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/ReadAjax**').as('getContactsPageTime')

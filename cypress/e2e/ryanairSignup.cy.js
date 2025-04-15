@@ -1,12 +1,7 @@
 import domData from '../fixtures/ryanair.json'
 
 describe('Ryanair sign-up', () => {
-  it('Sign up', {
-    retries: {
-      runMode: 1,
-      openMode: 1
-    }
-  }, () => {
+  it('Sign up', () => {
     cy.visit(domData.ryanairUrl)
 
     // Decline cookies
