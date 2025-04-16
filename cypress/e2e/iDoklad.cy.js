@@ -32,7 +32,7 @@ describe('i-Doklad', () => {
     cy.wait('@readContactsStartTime', { timeout: 5000 })
 
     // Delete all contacts
-    cy.get('thead[role="presentation"] > tr > th > input').should('exist').click()
+    cy.get('thead[role="presentation"] > tr > th > input').should('exist').check()
     cy.get('[data-ui-id="csw-grid-delete"] > button').should('exist').click()
 
     cy.intercept('GET', '**/api/Contact/ReadAjax**').as('readContactsEndTime')
@@ -159,6 +159,12 @@ describe('i-Doklad', () => {
     
     cy.get('tr.k-master-row').should(($rows) => {
       expect($rows.length).to.be.lessThan(allContactsLength)
+
+      const searchTerm = searchData[0].input.toLowerCase()
+      $rows.each((_, row) => {
+        const rowText = row.innerText.toLowerCase()
+        expect(rowText).to.include(searchTerm)
+      })
     })
   })
 
