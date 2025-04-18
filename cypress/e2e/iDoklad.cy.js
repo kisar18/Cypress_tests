@@ -168,7 +168,7 @@ describe('i-Doklad', () => {
     })
   })
 
-  it('Filter contacts', () => {
+  it('Sort contacts', () => {
 
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/ReadAjax**').as('getContactsPageTime')
