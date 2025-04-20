@@ -54,10 +54,15 @@ describe('Ryanair sign-up', () => {
       cy.get('@passwordField').type("passwd")
       cy.get('@passwordValidation').should('not.be.visible')
 
-      cy.wrap(iframeBody).find('ry-auth-password-validation > :nth-child(3) > :nth-child(1) > :nth-child(1)').should('have.class', 'icon--error')
-      cy.wrap(iframeBody).find('ry-auth-password-validation > :nth-child(4) > :nth-child(1) > :nth-child(1)').should('have.class', 'icon--error')
-      cy.wrap(iframeBody).find('ry-auth-password-validation > :nth-child(5) > :nth-child(1) > :nth-child(1)').should('have.class', 'icon--success')
-      cy.wrap(iframeBody).find('ry-auth-password-validation > :nth-child(6) > :nth-child(1) > :nth-child(1)').should('have.class', 'icon--error')
+      cy.wrap(iframeBody).find('ry-auth-password-validation > :nth-child(3) > :nth-child(1) > :nth-child(1)').as('oneNumberValidation').should('exist')
+      cy.wrap(iframeBody).find('ry-auth-password-validation > :nth-child(4) > :nth-child(1) > :nth-child(1)').as('eightCharactersValidation').should('exist')
+      cy.wrap(iframeBody).find('ry-auth-password-validation > :nth-child(5) > :nth-child(1) > :nth-child(1)').as('oneSmallLetterValidation').should('exist')
+      cy.wrap(iframeBody).find('ry-auth-password-validation > :nth-child(6) > :nth-child(1) > :nth-child(1)').as('oneBigLetterValidation').should('exist')
+
+      cy.get('@oneNumberValidation').should('have.class', 'icon--error')
+      cy.get('@eightCharactersValidation').should('have.class', 'icon--error')
+      cy.get('@oneSmallLetterValidation').should('have.class', 'icon--success')
+      cy.get('@oneBigLetterValidation').should('have.class', 'icon--error')
 
       // Create an account
       cy.createTempEmail().then(({ address, token }) => {
