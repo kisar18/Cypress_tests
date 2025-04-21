@@ -53,13 +53,27 @@ describe('Vse na stolni tenis', () => {
   it('Filtering tables by brand', () => {
 
     // Tables
-    cy.get('#navBarWithMegaMenu').find('li.nav-item').contains(domData.categories[1]).should('exist').click({ force: true })
+    cy.get('#catmenu1').contains(domData.categories[1]).should('exist').click({ force: true })
 
     cy.get('div[data-name="znacka"] > div > ul > li').contains(tables[0].brand).as('firstBrand').should('exist')
-    cy.get('@firstBrand').click()
+    cy.get('div[data-name="znacka"] > div > ul > li').contains(tables[1].brand).as('secondBrand').should('exist')
+    cy.get('div[data-name="znacka"] > div > ul > li').contains(tables[2].brand).as('thirdBrand').should('exist')
 
+    cy.get('@firstBrand').click()
     cy.get('.pp-cat-item > a > .pp-pbody > .pp-titlebox').each(($el) => {
       cy.wrap($el).should('contain.text', tables[0].brand)
+    })
+    
+    cy.get('@firstBrand').click()
+    cy.get('@secondBrand').click()
+    cy.get('.pp-cat-item > a > .pp-pbody > .pp-titlebox').each(($el) => {
+      cy.wrap($el).should('contain.text', tables[1].brand)
+    })
+
+    cy.get('@secondBrand').click()
+    cy.get('@thirdBrand').click()
+    cy.get('.pp-cat-item > a > .pp-pbody > .pp-titlebox').each(($el) => {
+      cy.wrap($el).should('contain.text', tables[2].brand)
     })
   })
 
