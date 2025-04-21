@@ -2,7 +2,7 @@ import tables from '../fixtures/vseNaStolniTenis/tables.json'
 import domData from '../fixtures/vseNaStolniTenis/domData.json'
 import languages from '../fixtures/vseNaStolniTenis/languages.json'
 
-Cypress.on('uncaught:exception', (err, runnable) => {
+Cypress.on('uncaught:exception', () => {
   return false
 })
 
@@ -84,7 +84,7 @@ describe('Vse na stolni tenis', () => {
 
     // Check the number of stores
     cy.get('.pp-blog-item').as('stores').should('exist')
-    cy.get('@stores').should('have.length', 6)
+    cy.get('@stores').should('have.length', domData.stores.length)
 
     // Check the info of each store
     cy.get('@stores').each(($el, index) => {
