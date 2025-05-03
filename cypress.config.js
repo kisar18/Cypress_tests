@@ -3,8 +3,13 @@ const { defineConfig } = require("cypress")
 module.exports = defineConfig({
   modifyObstructiveCode: false,
   e2e: {
-    setupNodeEvents(on, config) {
-      // implement node event listeners here
+    setupNodeEvents(on, config) {},
+    reporter: 'mochawesome',
+    reporterOptions: {
+      reportDir: 'cypress/results',
+      overwrite: false,
+      html: false,
+      json: true
     },
     retries: {
       runMode: 1,
