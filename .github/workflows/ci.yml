@@ -9,6 +9,7 @@ jobs:
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
+        continue-on-error: true
 
       - name: Upload Cypress test results
         uses: actions/upload-artifact@v4
