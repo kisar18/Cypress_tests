@@ -6,12 +6,21 @@ Cypress.on('uncaught:exception', () => {
   return false
 })
 
+let startTime
+
 describe('Vse na stolni tenis', () => {
   beforeEach(() => {
+    startTime = Date.now()
+
     cy.visit('https://www.vsenastolnitenis.cz/', { timeout: 15000 })
   
     // Decline cookies
     cy.get('#consentNone').should('exist').click()
+  })
+
+  afterEach(() => {
+    const duration = Date.now() - startTime
+    cy.log(`Test duration: ${duration} ms`)
   })
 
   it('Sorting tables by price', () => {

@@ -2,6 +2,8 @@ import domData from '../fixtures/ryanair.json'
 
 describe('Ryanair sign-up', () => {
   it('Sign up', () => {
+    const startTime = Date.now()
+
     cy.visit(domData.ryanairUrl)
 
     // Decline cookies
@@ -108,6 +110,11 @@ describe('Ryanair sign-up', () => {
           cy.get('button.log-out').contains(domData.logoutBtn).should('exist', { timeout: 10000 })
         })
       })
+    })
+
+    cy.then(() => {
+      const duration = Date.now() - startTime
+      cy.log(`Test duration ${duration} ms`)
     })
   })
 })

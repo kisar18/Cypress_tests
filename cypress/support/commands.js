@@ -17,7 +17,7 @@ Cypress.Commands.add('getByDataUiId', (data_ui_id) => {
 Cypress.Commands.add('iDokladLogin', (email, password) => {
   cy.session([email, password], () => {
 
-    cy.visit('https://app.idoklad.cz/Account/Login', { timeout: 15000 })
+    cy.visit('https://app.idoklad.cz/Account/Login', { timeout: 60000 })
     cy.getByDataUiId('csw-username').as('email').should('exist')
     cy.get('@email').type(email)
     cy.getByDataUiId('csw-password').as('password').should('exist')

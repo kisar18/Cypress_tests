@@ -3,10 +3,12 @@ import contacts from '../fixtures/iDoklad/contacts.json'
 import domData from '../fixtures/iDoklad/domData.json'
 import searchData from '../fixtures/iDoklad/searchData.json'
 
-// create new contact a create duplicate contact - 2 tests (maybe)
+let startTime
 
 describe('i-Doklad', () => {
   beforeEach(() => {
+    startTime = Date.now()
+
     cy.intercept('https://www.clarity.ms/**', {
       statusCode: 403,
     }).as('blockClarity')
@@ -38,6 +40,9 @@ describe('i-Doklad', () => {
     cy.intercept('GET', '**/api/Contact/ReadAjax**').as('readContactsEndTime')
     cy.getByDataUiId('csw-dialog-confirm').should('exist').click()
     cy.wait('@readContactsEndTime', { timeout: 5000 })
+
+    const duration = Date.now() - startTime
+    cy.log(`Test duration: ${duration} ms`)
   })
 
   it('Create contact', () => {
