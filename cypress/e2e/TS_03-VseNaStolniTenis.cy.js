@@ -8,7 +8,7 @@ Cypress.on('uncaught:exception', () => {
 
 let startTime
 
-describe('Vse na stolni tenis', () => {
+describe('TS_03-VseNaStolniTenis', () => {
   beforeEach(() => {
     startTime = Date.now()
 
@@ -23,7 +23,7 @@ describe('Vse na stolni tenis', () => {
     cy.log(`Test duration: ${duration} ms`)
   })
 
-  it('Sorting tables by price', () => {
+  it('TC_03_01 - Sorting tables by price', () => {
 
     // Tables
     cy.get('#navBarWithMegaMenu').find('li.nav-item').contains(domData.categories[1]).should('exist').click({ force: true })
@@ -59,7 +59,7 @@ describe('Vse na stolni tenis', () => {
       })
   })
 
-  it('Filtering tables by brand', () => {
+  it('TC_03_02 - Filtering tables by brand', () => {
 
     // Tables
     cy.get('#catmenu1').contains(domData.categories[1]).should('exist').click({ force: true })
@@ -86,7 +86,7 @@ describe('Vse na stolni tenis', () => {
     })
   })
 
-  it('Check contact info of all stores', () => {
+  it('TC_03_03 - Check contact info of all stores', () => {
 
     // Go to contacts page
     cy.get('#navBarWithDropdown').find('li.nav-item').contains(domData.headerMenuItems[2]).should('exist').click({ force: true })
@@ -108,7 +108,7 @@ describe('Vse na stolni tenis', () => {
     })
   })
 
-  it('Language translations', () => {
+  it('TC_03_04 - Language translations', () => {
 
     // Iterate trough all the languages
     languages.forEach((language, index) => {

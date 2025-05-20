@@ -1,0 +1,162 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 4,
+    "passes": 4,
+    "pending": 0,
+    "failures": 0,
+    "start": "2025-05-11T20:03:28.568Z",
+    "end": "2025-05-11T20:03:54.576Z",
+    "duration": 26008,
+    "testsRegistered": 4,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "cf3f8bcf-8448-4d0b-96e3-478ae3083bde",
+      "title": "",
+      "fullFile": "cypress/e2e/vseNaStolniTenis.cy.js",
+      "file": "cypress/e2e/vseNaStolniTenis.cy.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "960f0b48-bdaf-4219-bc79-271fd02a266b",
+          "title": "Vse na stolni tenis",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Sorting tables by price",
+              "fullTitle": "Vse na stolni tenis Sorting tables by price",
+              "timedOut": null,
+              "duration": 6356,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Tables\ncy.get('#navBarWithMegaMenu').find('li.nav-item').contains(_domData.default.categories[1]).should('exist').click({\n  force: true\n});\ncy.get('[class=\"product_price asc\"]').as('sortByPriceAsc').should('exist');\ncy.get('@sortByPriceAsc').click();\ncy.get('.pp-cat-item > a > .pp-pbody > .pp-pricebox > .price').then($prices => {\n  // Choose first 5 elements\n  const firstFivePrices = $prices.slice(0, 5).map((i, el) => {\n    return parseFloat(el.innerText.replace(/\\s?kč/i, '').replace(/\\./g, '').replace(',', '.'));\n  }).get();\n  // Verify that the prices are sorted ascending\n  const sortedPrices = [...firstFivePrices].sort((a, b) => a - b);\n  expect(firstFivePrices).to.deep.equal(sortedPrices);\n});\ncy.get('[class=\"product_price desc\"]').as('sortByPriceDesc').should('exist');\ncy.get('@sortByPriceDesc').click();\ncy.get('.pp-cat-item > a > .pp-pbody > .pp-pricebox > .price').then($prices => {\n  // Choose first 5 elements\n  const firstFivePrices = $prices.slice(0, 5).map((i, el) => {\n    return parseFloat(el.innerText.replace(/\\s?kč/i, '').replace(/\\./g, '').replace(',', '.'));\n  }).get();\n  // Verify that the prices are sorted descending\n  const sortedPrices = [...firstFivePrices].sort((a, b) => b - a);\n  expect(firstFivePrices).to.deep.equal(sortedPrices);\n});",
+              "err": {},
+              "uuid": "ab3f7ce8-07cb-4ffa-8517-49c00d3e0c8a",
+              "parentUUID": "960f0b48-bdaf-4219-bc79-271fd02a266b",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Filtering tables by brand",
+              "fullTitle": "Vse na stolni tenis Filtering tables by brand",
+              "timedOut": null,
+              "duration": 9238,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Tables\ncy.get('#catmenu1').contains(_domData.default.categories[1]).should('exist').click({\n  force: true\n});\ncy.get('div[data-name=\"znacka\"] > div > ul > li').contains(_tables.default[0].brand).as('firstBrand').should('exist');\ncy.get('div[data-name=\"znacka\"] > div > ul > li').contains(_tables.default[1].brand).as('secondBrand').should('exist');\ncy.get('div[data-name=\"znacka\"] > div > ul > li').contains(_tables.default[2].brand).as('thirdBrand').should('exist');\ncy.get('@firstBrand').click();\ncy.get('.pp-cat-item > a > .pp-pbody > .pp-titlebox').each($el => {\n  cy.wrap($el).should('contain.text', _tables.default[0].brand);\n});\ncy.get('@firstBrand').click();\ncy.get('@secondBrand').click();\ncy.get('.pp-cat-item > a > .pp-pbody > .pp-titlebox').each($el => {\n  cy.wrap($el).should('contain.text', _tables.default[1].brand);\n});\ncy.get('@secondBrand').click();\ncy.get('@thirdBrand').click();\ncy.get('.pp-cat-item > a > .pp-pbody > .pp-titlebox').each($el => {\n  cy.wrap($el).should('contain.text', _tables.default[2].brand);\n});",
+              "err": {},
+              "uuid": "80a2aa21-8d8d-49b7-a23c-ce5e782cc2f0",
+              "parentUUID": "960f0b48-bdaf-4219-bc79-271fd02a266b",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Check contact info of all stores",
+              "fullTitle": "Vse na stolni tenis Check contact info of all stores",
+              "timedOut": null,
+              "duration": 3830,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Go to contacts page\ncy.get('#navBarWithDropdown').find('li.nav-item').contains(_domData.default.headerMenuItems[2]).should('exist').click({\n  force: true\n});\n// Check the number of stores\ncy.get('.pp-blog-item').as('stores').should('exist');\ncy.get('@stores').should('have.length', _domData.default.stores.length);\n// Check the info of each store\ncy.get('@stores').each(($el, index) => {\n  cy.wrap($el).should('contain.text', _domData.default.stores[index].name);\n  cy.wrap($el).should('contain.text', _domData.default.stores[index].street);\n  cy.wrap($el).should('contain.text', _domData.default.stores[index].city);\n  cy.wrap($el).invoke('text').then(text => {\n    const cleanedText = text.replace(/\\s+/g, ' ').trim();\n    expect(cleanedText).to.contain(_domData.default.stores[index].openingHours);\n  });\n});",
+              "err": {},
+              "uuid": "410156ea-6765-43a2-a199-d647a0d3da18",
+              "parentUUID": "960f0b48-bdaf-4219-bc79-271fd02a266b",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Language translations",
+              "fullTitle": "Vse na stolni tenis Language translations",
+              "timedOut": null,
+              "duration": 5294,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Iterate trough all the languages\n_languages.default.forEach((language, index) => {\n  // Check the URL\n  cy.url().should('eq', language.url);\n  // Check the title\n  cy.title().should('eq', language.title);\n  // Check search field placeholder\n  cy.get('#desktopsearch > form > input[type=\"search\"]').as('searchField').should('exist');\n  cy.get('@searchField').should('have.attr', 'placeholder', language.searchPlaceholder);\n  // Check description of the flag image\n  cy.get('#languageChooser').as('flag').should('exist');\n  cy.get('@flag').find('#flag > img').should('have.attr', 'alt', language.flagAlt);\n  // Change the language\n  cy.get('@flag').click();\n  cy.get('#languageDropdown').as('otherLanguages').should('be.visible');\n  cy.get('@otherLanguages').find('.btn').should('have.length', _languages.default.length - 1);\n  if (index !== _languages.default.length - 1) {\n    cy.intercept('GET', '**/api/v1/widget/translations/lang/**').as('reloadTime');\n    cy.get('@otherLanguages').find('.btn').eq(index).click();\n    cy.wait('@reloadTime');\n  }\n});",
+              "err": {},
+              "uuid": "06e2e9ad-b289-45cc-83c5-d19b52539057",
+              "parentUUID": "960f0b48-bdaf-4219-bc79-271fd02a266b",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "ab3f7ce8-07cb-4ffa-8517-49c00d3e0c8a",
+            "80a2aa21-8d8d-49b7-a23c-ce5e782cc2f0",
+            "410156ea-6765-43a2-a199-d647a0d3da18",
+            "06e2e9ad-b289-45cc-83c5-d19b52539057"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 24718,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.0.1"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": false,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": {
+        "reportDir": "cypress/results",
+        "overwrite": false,
+        "html": false,
+        "json": true
+      },
+      "version": "6.2.0"
+    }
+  }
+}

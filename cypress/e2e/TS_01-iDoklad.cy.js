@@ -5,7 +5,7 @@ import searchData from '../fixtures/iDoklad/searchData.json'
 
 let startTime
 
-describe('i-Doklad', () => {
+describe('TS_01-iDoklad', () => {
   beforeEach(() => {
     startTime = Date.now()
 
@@ -45,7 +45,7 @@ describe('i-Doklad', () => {
     cy.log(`Test duration: ${duration} ms`)
   })
 
-  it('Create contact', () => {
+  it('TC_01_01 - Create contact', () => {
 
     // Open new contact form
     cy.getByDataUiId('csw-new-item').click()
@@ -76,7 +76,7 @@ describe('i-Doklad', () => {
     cy.wait('@readContactsPageTime', { timeout: 5000 })
   })
 
-  it('Edit first contact', () => {
+  it('TC_01_02 - Edit first contact', () => {
     
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
@@ -118,7 +118,7 @@ describe('i-Doklad', () => {
     cy.wait('@readContactsPageTime', { timeout: 5000 })
   })
 
-  it('Delete first contact', () => {
+  it('TC_01_03 - Delete first contact', () => {
 
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
@@ -143,7 +143,7 @@ describe('i-Doklad', () => {
     cy.wait('@readContactsPageTime', { timeout: 5000 })
   })
 
-  it('Search contacts', () => {
+  it('TC_01_04 - Search contacts', () => {
 
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/IndexData').as('getContactsPageTime')
@@ -173,7 +173,7 @@ describe('i-Doklad', () => {
     })
   })
 
-  it('Sort contacts', () => {
+  it('TC_01_05 - Sort contacts', () => {
 
     // Go to contacts list
     cy.intercept('GET', '**/api/Contact/ReadAjax**').as('getContactsPageTime')

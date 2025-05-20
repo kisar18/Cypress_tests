@@ -1,7 +1,7 @@
 import domData from '../fixtures/ryanair.json'
 
-describe('Ryanair sign-up', () => {
-  it('Sign up', () => {
+describe('TS_02-RyanairSignup', () => {
+  it('TC_02_01 - Sign up', () => {
     const startTime = Date.now()
 
     cy.visit(domData.ryanairUrl)
